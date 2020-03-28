@@ -62,23 +62,24 @@ $viewDir = rtrim($opts['view-dir'], '/');
 $viewPath = __DIR__ . '/../../' . $viewDir;
 $source = file_get_contents($opts['source']);
 
-createDir('tmp/views');
-createDir('tmp/cache');
-copyRecursive($viewPath, __DIR__ . '/tmp/views');
+$processDir = getmypid();
+createDir("tmp/$processDir/views");
+createDir("tmp/$processDir/cache");
+copyRecursive($viewPath, __DIR__ . "/tmp/$processDir/views");
 
-$currentViewPath = __DIR__ . '/tmp/views/__current__.blade.php';
+$currentViewPath = __DIR__ . "/tmp/$processDir/views/__current__.blade.php";
 file_put_contents($currentViewPath, $source);
 
 // Set up the ViewFactory
 $files = new Filesystem();
-$cachePath = __DIR__ . '/tmp/cache';
+$cachePath = __DIR__ . "/tmp/$processDir/cache";
 $compiler = new BladeCompiler($files, $cachePath);
 $compilerEngine = new CompilerEngine($compiler);
 $engines = new EngineResolver();
 $engines->register('blade', function () use ($compilerEngine) {
     return $compilerEngine;
 });
-$paths = [__DIR__ . '/tmp/views'];
+$paths = [__DIR__ . "/tmp/$processDir/views"];
 $finder = new FileViewFinder($files, $paths);
 $events = new Dispatcher();
 $factory = new Factory($engines, $finder, $events);
@@ -86,11 +87,11 @@ $factory = new Factory($engines, $finder, $events);
 try {
     $compiled = $factory->make('__current__')->render();
 } catch (Exception $e) {
-    removeRecursive(__DIR__ . '/tmp');
+    removeRecursive(__DIR__ . "/tmp/$processDir");
     throw $e;
 }
 
-removeRecursive(__DIR__ . '/tmp');
+removeRecursive(__DIR__ . "/tmp/$processDir");
 
 $handle = fopen($opts['out'], 'w');
 fwrite($handle, $compiled);
