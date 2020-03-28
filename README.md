@@ -4,7 +4,7 @@
   </a>
 </div>
 
-# webpack-blade-loader
+# webpack-blade-native-loader
 
 A webpack loader for blade template engine using illuminate/view itself.
 
