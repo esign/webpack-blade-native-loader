@@ -40,6 +40,23 @@ function copyRecursive($sourceDir, $destinationDir) {
     }
 }
 
+function removeRecursive($dir) {
+    foreach (new DirectoryIterator($dir) as $file_info) {
+        $filename = $file_info->getFilename();
+
+        if ($file_info->isDot()) {
+            continue;
+        }
+
+        if ($file_info->isDir()) {
+            removeRecursive("$dir/$filename");
+        } elseif ($file_info->isFile()) {
+            unlink($file_info->getRealPath());
+        }
+    }
+    rmdir("$dir");
+}
+
 $opts = getopt('', ['view-dir:', 'source:', 'out:']);
 $viewDir = rtrim($opts['view-dir'], '/');
 $viewPath = __DIR__ . '/../../' . $viewDir;
@@ -66,7 +83,15 @@ $finder = new FileViewFinder($files, $paths);
 $events = new Dispatcher();
 $factory = new Factory($engines, $finder, $events);
 
-$compiled = $factory->make('__current__');
+try {
+    $compiled = $factory->make('__current__')->render();
+} catch (Exception $e) {
+    removeRecursive(__DIR__ . '/tmp');
+    throw $e;
+}
+
+removeRecursive(__DIR__ . '/tmp');
+
 $handle = fopen($opts['out'], 'w');
 fwrite($handle, $compiled);
 fclose($handle);
