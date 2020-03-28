@@ -1,29 +1,27 @@
 {
   "name": "webpack-blade-native-loader",
-  "version": "0.0.1",
+  "version": "7.3.0",
   "description": "Webpack loader for Laravel's blade template engine.",
   "license": "MIT",
-  "repository": "esign/webpack-blade-native-loader",
   "author": {
     "name": "Bart Decorte",
     "email": "bart@esign.eu"
   },
-  "engines": {
-    "node": ">=6"
-  },
-  "scripts": {
-    "test": "xo && ava"
-  },
   "main": "index.js",
-  "keywords": [
-    "blade",
-    "webpack",
-    "template",
-    "engine"
-  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/esign/webpack-blade-native-loader.git"
+  },
   "dependencies": {
     "exec-buffer": "^3.0.0",
     "loader-utils": "^2.0.0",
     "schema-utils": "^2.6.5"
-  }
+  },
+  "bugs": {
+    "url": "https://gitlab.com/esign/webpack-blade-native-loader/-/issues"
+  },
+  "homepage": "https://gitlab.com/esign/webpack-blade-native-loader"
 }
