@@ -2,6 +2,6 @@
   "name": "webpack-blade-native-loader",
   "description": "Webpack loader for Laravel's blade template engine.",
   "require": {
-    "illuminate/view": "^7.3"
+    "illuminate/view": "7.4.*"
   }
 }
