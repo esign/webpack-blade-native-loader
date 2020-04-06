@@ -4,6 +4,7 @@
  * Time: 12:53
  */
 const execBuffer = require('exec-buffer');
+const execBuffer2 = require('exec-buffer');
 const loaderUtils = require('loader-utils');
 const validateOptions = require('schema-utils');
 
@@ -19,22 +20,54 @@ const schema = {
 };
 
 const configuration = { name: 'Webpack Blade Native Loader' };
+const moduleDir = 'node_modules/webpack-blade-native-loader/';
 
-module.exports = function (source) {
-  const options = loaderUtils.getOptions(this) || {};
-  validateOptions(schema, options, configuration);
-  const args = ['node_modules/webpack-blade-native-loader/index.php'];
-  args.push('--view-dir', options.viewDir);
-  args.push('--source', execBuffer.input);
-  args.push('--out', execBuffer.output);
+const getDependencies = (source) => {
+  const args = [`${moduleDir}dependencies.php`];
+  args.push('--source', execBuffer2.input);
+  args.push('--out', execBuffer2.output);
   const buffer = Buffer.from(source, 'utf8');
 
-  return execBuffer({
+  return execBuffer2({
     args,
     bin: 'php',
     input: buffer,
   }).catch(error => {
     error.message = error.stderr || error.message;
-    throw error;
+    return '[]';
+  }).then(json => {
+    return JSON.parse(json);
   });
+};
+
+const addDependencies = (dependencyList, options, context) => {
+  dependencyList.map(dependency => `${options.viewDir}/${dependency}.blade.php`)
+    .forEach((dependency) => { context.addDependency(dependency); console.log(dependency); });
+
+  return true;
+};
+
+module.exports = function (source) {
+  const options = loaderUtils.getOptions(this) || {};
+  validateOptions(schema, options, configuration);
+  const args = [`${moduleDir}index.php`];
+  args.push('--view-dir', options.viewDir);
+  args.push('--source', execBuffer.input);
+  args.push('--out', execBuffer.output);
+  const buffer = Buffer.from(source, 'utf8');
+
+  // todo add dependencies recursive
+
+  return getDependencies(source)
+    .then((dependencies) => addDependencies(dependencies, options, this))
+    .then(() => {
+      return execBuffer({
+        args,
+        bin: 'php',
+        input: buffer,
+      }).catch(error => {
+        error.message = error.stderr || error.message;
+        throw error;
+      });
+    });
 };
