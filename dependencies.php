@@ -23,7 +23,7 @@ $matches = array_filter($matches, function ($match) {
     return in_array($match[1], ['extends', 'include', 'component']);
 });
 $matches = array_map(function ($match) {
-    return trim($match[4], '\'"');
+    return trim(explode(',', $match[4])[0], '\'"');
 }, $matches);
 $matches = array_map(function ($match) {
     return str_replace('.', '/', $match);

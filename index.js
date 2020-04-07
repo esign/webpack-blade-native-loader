@@ -3,10 +3,10 @@
  * Date: 28/03/2020
  * Time: 12:53
  */
-const execBuffer = require('exec-buffer');
-const execBuffer2 = require('exec-buffer');
 const loaderUtils = require('loader-utils');
 const validateOptions = require('schema-utils');
+const fs = require('fs');
+const util = require('util');
 
 const schema = {
   type: 'object',
@@ -23,31 +23,45 @@ const configuration = { name: 'Webpack Blade Native Loader' };
 const moduleDir = 'node_modules/webpack-blade-native-loader/';
 
 const getDependencies = (source) => {
+  const execBuffer = require('exec-buffer');
   const args = [`${moduleDir}dependencies.php`];
-  args.push('--source', execBuffer2.input);
-  args.push('--out', execBuffer2.output);
+  args.push('--source', execBuffer.input);
+  args.push('--out', execBuffer.output);
   const buffer = Buffer.from(source, 'utf8');
 
-  return execBuffer2({
+  return execBuffer({
     args,
     bin: 'php',
     input: buffer,
   }).catch(error => {
     error.message = error.stderr || error.message;
-    return '[]';
+    throw error;
   }).then(json => {
     return JSON.parse(json);
   });
 };
 
-const addDependencies = (dependencyList, options, context) => {
-  dependencyList.map(dependency => `${options.viewDir}/${dependency}.blade.php`)
-    .forEach((dependency) => { context.addDependency(dependency); console.log(dependency); });
+const getPathDependencies = (path, options, context) => {
+  const func = util.promisify(fs.readFile);
+  return func(path)
+    .then((data) => getDependencies(data))
+    .then((dependencies) => addDependencies(dependencies, options, context))
+  ;
+};
 
-  return true;
+const addDependencies = (dependencyList, options, context) => {
+  const promises = [];
+  dependencyList.map(dependency => `${options.viewDir}/${dependency}.blade.php`)
+    .forEach((dependency) => {
+      context.addDependency(dependency);
+      promises.push(getPathDependencies(dependency, options, context));
+    });
+
+  return Promise.all(promises);
 };
 
 module.exports = function (source) {
+  const execBuffer = require('exec-buffer');
   const options = loaderUtils.getOptions(this) || {};
   validateOptions(schema, options, configuration);
   const args = [`${moduleDir}index.php`];
@@ -55,8 +69,6 @@ module.exports = function (source) {
   args.push('--source', execBuffer.input);
   args.push('--out', execBuffer.output);
   const buffer = Buffer.from(source, 'utf8');
-
-  // todo add dependencies recursive
 
   return getDependencies(source)
     .then((dependencies) => addDependencies(dependencies, options, this))
