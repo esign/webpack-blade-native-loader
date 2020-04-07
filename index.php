@@ -46,12 +46,10 @@ $factory = new Factory($engines, $finder, $events);
 
 try {
     $compiled = $factory->make($currentViewFilename)->render();
-} catch (Exception $e) {
+} finally {
     unlink($currentViewPath);
-    throw $e;
 }
 
-unlink($currentViewPath);
 $handle = fopen($opts['out'], 'w');
 fwrite($handle, $compiled);
 fclose($handle);
