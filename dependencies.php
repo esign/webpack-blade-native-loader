@@ -8,8 +8,8 @@
 $opts = getopt('', ['source:', 'out:']);
 $source = file_get_contents($opts['source']);
 
-// BladeCompiler:412
 $matches = [];
+// Illuminate\View\Compilers\BladeCompiler:compileStatements() line 407
 preg_replace_callback(
     '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function ($match) use (&$matches) {
     $matches[] = $match;

@@ -14,85 +14,44 @@ use \Illuminate\Events\Dispatcher;
 use \Illuminate\View\Compilers\BladeCompiler;
 use \Illuminate\View\Engines\CompilerEngine;
 
-function createDir($dir) {
-    $pieces = explode('/', $dir);
-    for ($i = 0; $i < count($pieces); $i++) {
-        if (!file_exists($path = __DIR__ . '/' . implode('/', array_slice($pieces, 0, $i + 1)))) {
-            mkdir($path);
-        }
-    }
-}
-
-function copyRecursive($sourceDir, $destinationDir) {
-    foreach (new DirectoryIterator($sourceDir) as $file_info) {
-        $filename = $file_info->getFilename();
-
-        if ($file_info->isDot()) {
-            continue;
-        }
-
-        if ($file_info->isDir()) {
-            mkdir("$destinationDir/$filename");
-            copyRecursive($file_info->getRealPath(), "$destinationDir/$filename");
-        } elseif ($file_info->isFile()) {
-            copy($file_info->getRealPath(), "$destinationDir/$filename");
-        }
-    }
-}
-
-function removeRecursive($dir) {
-    foreach (new DirectoryIterator($dir) as $file_info) {
-        $filename = $file_info->getFilename();
-
-        if ($file_info->isDot()) {
-            continue;
-        }
-
-        if ($file_info->isDir()) {
-            removeRecursive("$dir/$filename");
-        } elseif ($file_info->isFile()) {
-            unlink($file_info->getRealPath());
-        }
-    }
-    rmdir("$dir");
-}
-
 $opts = getopt('', ['view-dir:', 'source:', 'out:']);
-$viewDir = rtrim($opts['view-dir'], '/');
+$viewDir = trim($opts['view-dir'], '/');
 $viewPath = __DIR__ . '/../../' . $viewDir;
 $source = file_get_contents($opts['source']);
+$cachePath = __DIR__ . '/cache';
 
-$processDir = getmypid();
-createDir("tmp/$processDir/views");
-createDir("tmp/$processDir/cache");
-copyRecursive($viewPath, __DIR__ . "/tmp/$processDir/views");
+if (!file_exists($cachePath)) {
+    mkdir(__DIR__ . '/cache');
+}
 
-$currentViewPath = __DIR__ . "/tmp/$processDir/views/__current__.blade.php";
+$currentViewFilename = '__' . md5(rand(0, 999999));
+while (file_exists($currentViewPath = "$viewPath/$currentViewFilename.blade.php")) {
+    $currentViewFilename = '__' . md5(rand(0, 999999));
+}
+
 file_put_contents($currentViewPath, $source);
 
 // Set up the ViewFactory
 $files = new Filesystem();
-$cachePath = __DIR__ . "/tmp/$processDir/cache";
 $compiler = new BladeCompiler($files, $cachePath);
 $compilerEngine = new CompilerEngine($compiler);
 $engines = new EngineResolver();
 $engines->register('blade', function () use ($compilerEngine) {
     return $compilerEngine;
 });
-$paths = [__DIR__ . "/tmp/$processDir/views"];
+$paths = [$viewPath];
 $finder = new FileViewFinder($files, $paths);
 $events = new Dispatcher();
 $factory = new Factory($engines, $finder, $events);
 
 try {
-    $compiled = $factory->make('__current__')->render();
+    $compiled = $factory->make($currentViewFilename)->render();
 } catch (Exception $e) {
-    removeRecursive(__DIR__ . "/tmp/$processDir");
+    unlink($currentViewPath);
     throw $e;
 }
 
-removeRecursive(__DIR__ . "/tmp/$processDir");
-
+unlink($currentViewPath);
 $handle = fopen($opts['out'], 'w');
 fwrite($handle, $compiled);
 fclose($handle);
