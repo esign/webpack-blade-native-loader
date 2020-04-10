@@ -110,7 +110,8 @@ The path of the directory where template files are located.
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see 
+[License File](https://gitlab.com/esign/webpack-blade-native-loader/-/blob/master/LICENSE.md) for more information.
 
 ## Credits
 
