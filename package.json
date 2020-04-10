@@ -1,6 +1,6 @@
 {
   "name": "webpack-blade-native-loader",
-  "version": "7.5.1",
+  "version": "7.5.2",
   "description": "Webpack loader for Laravel's blade template engine.",
   "license": "MIT",
   "author": {
