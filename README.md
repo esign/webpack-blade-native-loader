@@ -12,7 +12,7 @@ component itself.
 ## How does it work?
 
 This loader passes on the contents of your blade views to a PHP script. The PHP script sets up a ViewFactory to render
-the blade code to HTML. This means that your views are rendered entirely using PHP. The resulting HTML is passed back to
+the blade code to HTML. This means that your views are rendered entirely using PHP. The resulting HTML is passed back
 into the Webpack flow.
 
 ## Requirements
