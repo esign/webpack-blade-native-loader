@@ -7,6 +7,7 @@ const loaderUtils = require('loader-utils');
 const validateOptions = require('schema-utils');
 const fs = require('fs');
 const util = require('util');
+const path = require('path');
 
 const schema = {
   type: 'object',
@@ -24,7 +25,7 @@ const moduleDir = 'node_modules/webpack-blade-native-loader/';
 
 const getDependencies = (source) => {
   const execBuffer = require('exec-buffer');
-  const args = [`${moduleDir}dependencies.php`];
+  const args = [path.normalize(`${moduleDir}dependencies.php`)];
   args.push('--source', execBuffer.input);
   args.push('--out', execBuffer.output);
   const buffer = Buffer.from(source, 'utf8');
@@ -51,7 +52,7 @@ const getPathDependencies = (path, options, context) => {
 
 const addDependencies = (dependencyList, options, context) => {
   const promises = [];
-  dependencyList.map(dependency => `${options.viewDir}/${dependency}.blade.php`)
+  dependencyList.map(dependency => path.normalize(`${options.viewDir}/${dependency}.blade.php`))
     .forEach((dependency) => {
       context.addDependency(dependency);
       promises.push(getPathDependencies(dependency, options, context));
