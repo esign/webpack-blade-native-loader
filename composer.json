@@ -3,6 +3,6 @@
   "description": "Webpack loader for Laravel's blade template engine.",
   "require": {
     "illuminate/view": "7.6.*",
-    "ext-json": "^7.4"
+    "ext-json": "^1.7 || ^7.4"
   }
 }
