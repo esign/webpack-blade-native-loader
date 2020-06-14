@@ -1,6 +1,11 @@
 {
   "name": "esign/webpack-blade-native-loader",
   "description": "Webpack loader for Laravel's blade template engine.",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
   "require": {
     "illuminate/view": "7.6.*",
     "ext-json": "^1.7 || ^7.4"

@@ -11,8 +11,9 @@ use \Illuminate\View\Engines\EngineResolver;
 use \Illuminate\View\FileViewFinder;
 use \Illuminate\Filesystem\Filesystem;
 use \Illuminate\Events\Dispatcher;
-use \Illuminate\View\Compilers\BladeCompiler;
 use \Illuminate\View\Engines\CompilerEngine;
+use \Illuminate\Container\Container;
+use \App\BladeCompiler;
 
 $opts = getopt('', ['view-dir:', 'source:', 'out:']);
 $viewDir = trim($opts['view-dir'], '/');
@@ -40,9 +41,16 @@ $engines->register('blade', function () use ($compilerEngine) {
     return $compilerEngine;
 });
 $paths = [$viewPath];
+$container = new Container();
+Container::setInstance($container);
 $finder = new FileViewFinder($files, $paths);
-$events = new Dispatcher();
+$events = new Dispatcher($container);
 $factory = new Factory($engines, $finder, $events);
+$factory->setContainer($container);
+$container->singleton(\Illuminate\Contracts\View\Factory::class, function ($app) use ($factory) {
+    return $factory;
+});
+$container->alias(\Illuminate\Contracts\View\Factory::class, 'view');
 
 try {
     $compiled = $factory->make($currentViewFilename)->render();
