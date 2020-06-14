@@ -1,5 +1,5 @@
 {
-  "name": "webpack-blade-native-loader",
+  "name": "esign/webpack-blade-native-loader",
   "description": "Webpack loader for Laravel's blade template engine.",
   "require": {
     "illuminate/view": "7.6.*",
