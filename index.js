@@ -22,10 +22,12 @@ const schema = {
 
 const configuration = { name: 'Webpack Blade Native Loader' };
 const moduleDir = 'node_modules/webpack-blade-native-loader/';
+let options = {};
 
 const getDependencies = (source) => {
   const execBuffer = require('exec-buffer');
   const args = [path.normalize(`${moduleDir}dependencies.php`)];
+  args.push('--view-dir', options.viewDir);
   args.push('--source', execBuffer.input);
   args.push('--out', execBuffer.output);
   const buffer = Buffer.from(source, 'utf8');
@@ -63,7 +65,7 @@ const addDependencies = (dependencyList, options, context) => {
 
 module.exports = function (source) {
   const execBuffer = require('exec-buffer');
-  const options = loaderUtils.getOptions(this) || {};
+  options = loaderUtils.getOptions(this) || {};
   validateOptions(schema, options, configuration);
   const args = [`${moduleDir}index.php`];
   args.push('--view-dir', options.viewDir);
