@@ -7,7 +7,7 @@
     }
   },
   "require": {
-    "illuminate/view": "7.6.*",
-    "ext-json": "^1.7 || ^7.4"
+    "illuminate/view": "^7.0",
+    "ext-json": "*"
   }
 }
