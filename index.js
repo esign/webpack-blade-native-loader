@@ -5,7 +5,7 @@
  */
 const loaderUtils = require('loader-utils');
 const validateOptions = require('schema-utils');
-const fs = require('fs');
+const fs = require('graceful-fs');
 const util = require('util');
 const path = require('path');
 
