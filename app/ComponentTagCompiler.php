@@ -13,12 +13,7 @@ use InvalidArgumentException;
 
 class ComponentTagCompiler extends BaseComponentTagCompiler
 {
-    /**
-     * @param \App\string $component
-     * @return string
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    protected function componentClass(string $component)
+    public function componentClass(string $component)
     {
         $viewFactory = Container::getInstance()->make(Factory::class);
 
