@@ -18,7 +18,7 @@ class ComponentTagCompiler extends BaseComponentTagCompiler
      * @return string
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected function componentClass(string $component)
+    public function componentClass(string $component)
     {
         $viewFactory = Container::getInstance()->make(Factory::class);
 

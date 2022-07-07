@@ -47,18 +47,21 @@ const getDependencies = (source) => {
 const getPathDependencies = (path, options, context) => {
   const func = util.promisify(fs.readFile);
   return func(path)
-    .then((data) => getDependencies(data))
-    .then((dependencies) => addDependencies(dependencies, options, context))
+  .then((data) => getDependencies(data))
+  .then((dependencies) => addDependencies(dependencies, options, context))
   ;
 };
 
 const addDependencies = (dependencyList, options, context) => {
   const promises = [];
+
   dependencyList.map(dependency => path.normalize(`${options.viewDir}/${dependency}.blade.php`))
-    .forEach((dependency) => {
-      context.addDependency(dependency);
-      promises.push(getPathDependencies(dependency, options, context));
-    });
+  .forEach((dependencyRelative) => {
+    const dependencyAbsolute = path.resolve(dependencyRelative);
+    context.addDependency(dependencyAbsolute);
+    const childDependencies = getPathDependencies(dependencyRelative, options, context);
+    promises.push(childDependencies);
+  });
 
   return Promise.all(promises);
 };
@@ -73,6 +76,8 @@ module.exports = function (source) {
   args.push('--out', execBuffer.output);
   const buffer = Buffer.from(source, 'utf8');
 
+  const callback = this.async();
+
   return getDependencies(source)
     .then((dependencies) => addDependencies(dependencies, options, this))
     .then(() => {
@@ -82,7 +87,18 @@ module.exports = function (source) {
         input: buffer,
       }).catch(error => {
         error.message = error.stderr || error.message;
-        throw error;
+        return { err: error };
+      }).then(result => {
+        return { err: null, result };
       });
-    });
+    })
+    .then(({ err, result }) => {
+      if (typeof result !== typeof undefined) {
+        callback(err, result);
+        return;
+      }
+
+      callback(err);
+    })
+  ;
 };

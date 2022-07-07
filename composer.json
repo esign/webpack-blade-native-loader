@@ -7,7 +7,8 @@
     }
   },
   "require": {
-    "illuminate/view": "^7.0",
-    "ext-json": "*"
+    "illuminate/view": "^9.0",
+    "ext-json": "*",
+    "php": "^8.0"
   }
 }
