@@ -26,6 +26,10 @@ class ComponentTagCompiler extends BaseComponentTagCompiler
             return $view;
         }
 
+        if ($viewFactory->exists($view = "components.{$component}.index")) {
+            return $view;
+        }
+
         throw new InvalidArgumentException(
             "Unable to locate a class or view for component [{$component}]."
         );
