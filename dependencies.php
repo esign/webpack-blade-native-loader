@@ -56,6 +56,9 @@ $tagViews = array_map(function ($match) use ($factory) {
     if ($factory->exists($view = "components.{$match}")) {
         return $view;
     }
+    if ($factory->exists($view = "components.{$match}.index")) {
+        return $view;
+    }
     return null;
 }, $tagMatches);
 $tagViews = array_filter($tagViews);
