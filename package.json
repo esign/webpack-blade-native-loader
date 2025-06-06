@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/esign/webpack-blade-native-loader.git"
+    "url": "https://github.com/esign/webpack-blade-native-loader.git"
   },
   "dependencies": {
     "exec-buffer": "^3.0.0",
@@ -23,7 +23,7 @@
     "schema-utils": "^2.6.5"
   },
   "bugs": {
-    "url": "https://gitlab.com/esign/webpack-blade-native-loader/-/issues"
+    "url": "https://github.com/esign/webpack-blade-native-loader/issues"
   },
-  "homepage": "https://gitlab.com/esign/webpack-blade-native-loader"
+  "homepage": "https://github.com/esign/webpack-blade-native-loader"
 }
